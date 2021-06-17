@@ -13,11 +13,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <title>Starter</title>
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="{{asset('plugin/all.min.css')}}">
+    <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
     <!-- Theme style -->
-    <link rel="stylesheet" type="text/css" href="https://adminlte.io/themes/dev/AdminLTE/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{asset('css/adminlte.min.css')}}" />
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
+    <!-- Bootstrap 4 -->
+    <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -168,11 +173,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <!-- REQUIRED SCRIPTS -->
 
-<!-- jQuery -->
-<script src="https://adminlte.io/themes/dev/AdminLTE/plugins/jquery/jquery.min.js" ></script>
-<!-- Bootstrap 4 -->
-<script src="https://adminlte.io/themes/dev/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
-<script src="https://adminlte.io/themes/dev/AdminLTE/dist/js/adminlte.min.js"></script>
+<script src="{{asset('js/adminlte.min.js')}}"></script>
 </body>
 </html>
