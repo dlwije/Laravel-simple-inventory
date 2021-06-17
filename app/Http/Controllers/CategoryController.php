@@ -19,4 +19,9 @@ class CategoryController extends Controller
         $category_list = $this->categoryRepository->getAllCategories();
         return view('category_list',compact('category_list'));
     }
+
+    public function addNewView(){
+
+        return view('');
+    }
 }
