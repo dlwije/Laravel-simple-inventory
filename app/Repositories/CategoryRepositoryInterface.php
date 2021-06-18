@@ -8,6 +8,8 @@ interface CategoryRepositoryInterface
 {
     public function getAllCategories();
 
+    public function getCategoryWithChildren();
+
     public function getActiveCategories();
 
     public function getParentCategoryList();
@@ -23,4 +25,5 @@ interface CategoryRepositoryInterface
     public function getDataTableList($data);
 
     public function inactivateCategory($id);
+
 }

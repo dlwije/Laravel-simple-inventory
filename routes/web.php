@@ -20,6 +20,10 @@ Route::post('get-category-data-table-list',[CategoryController::class,'getDataTa
 
 Route::post('submit-category-data',[CategoryController::class,'submitNewCategoryData'])->name('submitNewCategoryData');
 
+Route::get('get-edit-category-data/{cate_id}',[CategoryController::class,'getEditCategoryData'])->name('getEditCategoryData');
+
+Route::post('submit-edit-category-data',[CategoryController::class,'submitEditCategoryData'])->name('submitEditCategoryData');
+
 Route::post('get-parent-category-data',[CategoryController::class,'getParentCategoryList'])->name('getParentCategoryList');
 
 Route::post('inactive-category',[CategoryController::class,'inactivateCategory'])->name('inactivateCategory');

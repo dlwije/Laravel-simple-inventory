@@ -26,17 +26,10 @@
                             </tr>
                             </thead>
                             <tbody>
+{{--                            @php echo"<pre>"; print_r($category_list); @endphp--}}
                             @foreach($category_list AS $cate_list)
                                 <tr>
-                                    <td>
-                                        @if(empty($cate_list->parent_id))
-                                            {{$cate_list->c_name}}
-                                        @else
-                                            @php echo $cate_list->subCateName.'<sub>sub</sub>' @endphp
-
-                                        @endif
-
-                                    </td>
+                                    <td>{{$cate_list->c_name}}</td>
                                     <td>
                                         @if($cate_list->is_active)
                                             <span class="text-white badge badge-success">Active</span>
@@ -45,10 +38,31 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
+                                        <a class="btn btn-primary btn-sm" onclick="getEditFormData('{{$cate_list->id}}')"><i class="fa fa-edit"></i></a>
                                         <a class="btn btn-primary btn-sm" onclick="removeCategory('{{$cate_list->id}}')"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
+
+                                @if ($cate_list->children)
+
+                                        @foreach ($cate_list->children as $child)
+                                            <tr>
+                                                <td>{{ $cate_list->c_name.'/'.$child->c_name }}</td>
+                                                <td>
+                                                    @if($cate_list->is_active)
+                                                        <span class="text-white badge badge-success">Active</span>
+                                                    @else
+                                                        <span class="text-white badge badge-warning">Inactive</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary btn-sm" onclick="getEditFormData('{{$cate_list->id}}')"><i class="fa fa-edit"></i></a>
+                                                    <a class="btn btn-primary btn-sm" onclick="removeCategory('{{$cate_list->id}}')"><i class="fa fa-trash"></i></a>
+                                                </td>
+                                            </tr>
+
+                                        @endforeach
+                                @endif
                             @endforeach
                             </tbody>
                         </table>
@@ -89,7 +103,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="submitAddNewForm()">Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="submitAddNewForm(0)">Submit</button>
                     </div>
                 </div>
             </div>
@@ -110,6 +124,7 @@
 
     <script>
         var is_new = true;
+        var cate_id = '';
         $(document).ready(function () {
 
             dataTable();
@@ -117,71 +132,6 @@
         function dataTable() {
 
             $('#category_tbl').DataTable();
-            /*if ( $.fn.DataTable.isDataTable('#category_tbl') ) {
-                $('#category_tbl').DataTable().destroy();
-            }
-
-            $('#category_tbl tbody').empty();
-
-            var tbl = $('#category_tbl').DataTable( {
-                // dom: "Bfrtip",
-                paging: true,
-                searchDelay: 350,
-                pageLength: 10,
-                "ordering": false,
-                ajax: function ( data, callback, settings ) {
-
-                    $.ajax({
-                        url: "{{route('getCategoryDataTableList')}}",
-                        dataType: 'text',
-                        type: 'post',
-                        contentType: 'application/x-www-form-urlencoded',
-                        data: {
-                            RecordsStart: data.start,
-                            PageSize: data.length,
-                            SearchTerm: data.search,
-                            '_token':'{{csrf_token()}}',
-                        },
-                        beforeSend: function (jqXHR, settings) {
-
-                            // self.StartLoading();
-                        },
-                        success: function( data, textStatus, jQxhr ){
-
-                            var json_val = JSON.parse(data);
-                            // console.log(json_val.TotalRecords);
-                            setTimeout( function () {
-                                callback({
-                                    // draw: data.draw,
-                                    data: json_val.Data,
-                                    recordsTotal:  json_val.TotalRecords,
-                                    recordsFiltered:  json_val.RecordsFiltered
-                                });
-                            }, 50 );
-                        },
-                        error: function( jqXhr, textStatus, errorThrown ){
-                        }
-                    });
-                },
-                serverSide: true,
-                columns: [
-                    { data: "c_name" },
-                    {"sClass": "text-center",
-                        mRender: function (data, type, row) {
-                            if(row.is_active == 1)
-                                return '<span class="text-white badge badge-success">Active</span>'
-                            else if(row.is_active == 0)
-                                return '<span class="text-white badge badge-warning">Inactive</span>'
-                        }
-                    },
-                    {
-                        data: "id", "sClass": "text-center", render: function ( data, type, row ) {
-                            return '<i data-toggle="tooltip" data-placement="bottom" title="edit" class="fas fa-edit" style="cursor: pointer;" onclick="showEditView('+data+')"></i>' +
-                                '<i data-toggle="tooltip" data-placement="bottom" title="Inactive" class="fas fa-eye-slash" style="cursor: pointer;margin-left: 10px;" onclick="showConfirmDialog('+data+');"></i>';
-                        }
-                    }
-                ]
-            } );*/
         }
 
         function showAddNewView() {
@@ -192,14 +142,24 @@
 
             $('#parent_cate_drop_id').val('');
             $('#category_name').val('');
+            is_new = true;
         }
 
-        function submitAddNewForm() {
+        function submitAddNewForm(id) {
+            var url = '';
+            if(is_new === true)
+                url = '{{route('submitNewCategoryData')}}';
+            else{
+                id = cate_id;
+                url = '{{route('submitEditCategoryData')}}';
+            }
+
             $.ajax({
                 type: "post",
-                url: '{{route('submitNewCategoryData')}}',
+                url: url,
                 data:{
                     '_token':'{{csrf_token()}}',
+                    'category_id': id,
                     'parent_cate_id':$.trim($('#parent_cate_drop_id').val()),
                     'category_name':$.trim($('#category_name').val())
                 },
@@ -214,7 +174,49 @@
 
                         setTimeout(function () {
                             location.reload();
-                        },350);
+                        },300);
+                    }else{
+                        alert('Error = '+data.message);
+                    }
+
+                },
+                error: function(data){
+
+                    var errors = data.responseJSON.message;
+                    if(typeof data.responseJSON.message == "undefined") errors = (data.responseJSON[0].message);
+
+                    var errorList = "";
+
+                    if(typeof data.responseJSON.message == "undefined"){
+                        errorList +=  data.responseJSON[0].message + '';
+                    }else {
+                        $.each(errors, function (i, error) {
+                            errorList += '' + error + '';
+                        })
+                    }
+                    errorList +=""
+
+                    alert('Need attention! '+errorList);
+                }
+            });
+        }
+
+        function getEditFormData(id) {
+            cate_id = id;
+            $.ajax({
+                type: "get",
+                url: '/get-edit-category-data/'+id,
+                dataType: 'json',
+                success: function (data) {
+
+                    if(data.dataCount > 0){
+
+                        clearFormFields();
+                        is_new = false;
+                        $('#parent_cate_drop_id').val(data.data[0].parent_id);
+                        $('#category_name').val(data.data[0].c_name);
+                        $('#add-category-model').modal('show');
+
                     }else{
                         alert('Error = '+data.message);
                     }
@@ -256,7 +258,7 @@
 
                         setTimeout(function () {
                             location.reload();
-                        }, 350);
+                        }, 300);
                     } else {
 
                         alert('Error = ' + data.message);

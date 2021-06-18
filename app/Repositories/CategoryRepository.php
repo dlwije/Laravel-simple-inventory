@@ -17,6 +17,11 @@ class CategoryRepository implements CategoryRepositoryInterface
             ->get();
     }
 
+    public function getCategoryWithChildren(){
+
+       return Category::with('children')->whereNull('parent_id')->get();
+    }
+
     public function getActiveCategories()
     {
         return Category::where('is_active',1)->get();
@@ -39,7 +44,9 @@ class CategoryRepository implements CategoryRepositoryInterface
 
     public function getSingleCategoryData($id)
     {
-        return Category::where('id',$id)->get();
+        $resp = Category::where('id',$id)->get();
+
+        return array('data' => $resp,'dataCount'=>$resp->count());
     }
 
     public function updateCategory($id,$upData)
