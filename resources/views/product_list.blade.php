@@ -8,11 +8,11 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title">Categories</h5>
+                        <h5 class="card-title">Products</h5>
 
                         <div class="card-tools">
 
-                            <a href="javascript:0" class="btn btn-primary" onclick="showAddNewView();">Add New</a>
+                            <a href="{{route('productAddView')}}" class="btn btn-primary" >Add New</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -20,16 +20,16 @@
                         <table class="table table-bordered table-hover dataTable" id="category_tbl">
                             <thead>
                             <tr>
-                                <th>Category name</th>
+                                <th>Product name</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
 {{--                            @php echo"<pre>"; print_r($category_list); @endphp--}}
-                            @foreach($category_list AS $cate_list)
+                            @foreach($pro_list AS $cate_list)
                                 <tr>
-                                    <td>{{$cate_list->c_name}}</td>
+                                    <td>{{$cate_list->p_name}}</td>
                                     <td>
                                         @if($cate_list->is_active)
                                             <span class="text-white badge badge-success">Active</span>
@@ -42,27 +42,6 @@
                                         <a class="btn btn-primary btn-sm" onclick="removeCategory('{{$cate_list->id}}')"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
-
-                                @if ($cate_list->children)
-
-                                        @foreach ($cate_list->children as $child)
-                                            <tr>
-                                                <td>{{ $cate_list->c_name }}<sub>{{$child->c_name}}</sub></td>
-                                                <td>
-                                                    @if($cate_list->is_active)
-                                                        <span class="text-white badge badge-success">Active</span>
-                                                    @else
-                                                        <span class="text-white badge badge-warning">Inactive</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a class="btn btn-primary btn-sm" onclick="getEditFormData('{{$cate_list->id}}')"><i class="fa fa-edit"></i></a>
-                                                    <a class="btn btn-primary btn-sm" onclick="removeCategory('{{$cate_list->id}}')"><i class="fa fa-trash"></i></a>
-                                                </td>
-                                            </tr>
-
-                                        @endforeach
-                                @endif
                             @endforeach
                             </tbody>
                         </table>
@@ -73,41 +52,6 @@
         </div>
         <!-- /.row -->
 
-        <!-- add Modal -->
-        <div class="modal fade" id="add-category-model" tabindex="-1" data-backdrop="static" role="dialog"  aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="example-Modal3">Category</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group" >
-                                <label for="recipient-name" class="form-control-label">Parent Category</label>
-                                <select class="form-control" id="parent_cate_drop_id">
-                                    <option value=""></option>
-                                    @foreach($parent_cate_list AS $pc_list)
-                                        <option value="{{$pc_list->id}}">{{$pc_list->c_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="recipient-name" class="form-control-label">Category Name:</label>
-                                <input type="text" class="form-control" id="category_name">
-                            </div>
-
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="submitAddNewForm(0)">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     </div><!-- /.container-fluid -->
 

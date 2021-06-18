@@ -120,8 +120,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{route('home')}}" class="nav-link">
-                            <i class="nav-icon fas fa-th"></i>
+                        <a href="{{route('productList')}}" class="nav-link">
+                            <i class="nav-icon fas fa-box-open"></i>
                             <p>
                                 Product
                             </p>

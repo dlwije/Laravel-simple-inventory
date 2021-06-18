@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,3 +28,8 @@ Route::post('submit-edit-category-data',[CategoryController::class,'submitEditCa
 Route::post('get-parent-category-data',[CategoryController::class,'getParentCategoryList'])->name('getParentCategoryList');
 
 Route::post('inactive-category',[CategoryController::class,'inactivateCategory'])->name('inactivateCategory');
+
+
+Route::get('product-list', [ProductController::class,'index'])->name('productList');
+
+Route::get('product-add', [ProductController::class,'productAddView'])->name('productAddView');
