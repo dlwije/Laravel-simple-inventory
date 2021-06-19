@@ -57,6 +57,22 @@ class ProductController extends Controller
         return response()->json($resp_array);
 
     }
+
+    public function getProductPhotoList(Request $request){
+
+        $id = ($request->pro_id);
+
+        $resp = $this->productRepository->getProductPhotoData($id);
+
+        $resp_array = array(
+            'dataCount' => $resp->count(),
+            'data' => $resp
+        );
+
+        return response()->json($resp_array);
+
+    }
+
     public function submitProductData(Request $request){
 
         $validateData = Validator::make($request->all(),[

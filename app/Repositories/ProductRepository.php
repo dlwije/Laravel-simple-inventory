@@ -38,6 +38,8 @@ class ProductRepository implements ProductRepositoryInterface
 
                 if($resp_img['status']) $image_name = $resp_img['image_name'];
 
+                Log::error('image_name'.$resp_img['image_name']);
+
                 $this->saveProductImages($resp->id,$image_name);
             }
 
@@ -254,5 +256,12 @@ class ProductRepository implements ProductRepositoryInterface
         // TODO: Implement getProductPriceData() method.
 
         return ProductPrice::where('product_id',$id)->get();
+    }
+
+    public function getProductPhotoData($pro_id)
+    {
+        // TODO: Implement getProductPhotoData() method.
+
+        return ProductImage::where('product_id',$pro_id)->get();
     }
 }

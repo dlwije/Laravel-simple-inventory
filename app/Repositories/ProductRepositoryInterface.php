@@ -19,4 +19,6 @@ interface ProductRepositoryInterface
     public function getProductCategoryData($pro_id);
 
     public function getProductPriceData($pro_id);
+
+    public function getProductPhotoData($pro_id);
 }

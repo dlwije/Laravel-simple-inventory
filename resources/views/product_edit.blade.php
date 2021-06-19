@@ -88,6 +88,25 @@
                         </table>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-responsive table-striped table-condensed">
+                            <thead>
+                            <tr>
+                                <th>File</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody data-bind="foreach: product_photo_list">
+                            <tr>
+                                <td data-bind="text: photoDummy"></td>
+
+                                <td class="text-center" ><i class="fas fa-trash" style="cursor: pointer;color: red;" data-bind="click: $parent.RemovePhotoGridRow.bind($data, $index())"></i></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-md-12">
@@ -118,6 +137,7 @@
                 productAdd.ivm = new productAdd.productAddViewModel();
                 ko.applyBindings(productAdd.ivm, $('#product_add_view')[0]);
                 productAdd.ivm.getProductPriceList();
+                productAdd.ivm.getProductPhotoList();
             },
             productAddViewModel: function () {
 
@@ -132,6 +152,12 @@
                 self.pro_qty = ko.observable("");
                 self.pro_price = ko.observable("");
                 self.product_price_list = ko.observableArray("");
+
+                self.photoFile = ko.observable("");
+                self.photoFileFileObject = ko.observable("");
+                self.photoFileDummy = ko.observable("");
+                self.photoFileFormData = ko.observable("");
+                self.product_photo_list = ko.observableArray("");
 
                 self.pro_name('{{$pro_data[0]->p_name}}');
                 self.product_id('{{$pro_data[0]->id}}');
@@ -181,6 +207,78 @@
                         }
                     });
 
+                }
+
+                self.getProductPhotoList = function () {
+
+                    $.ajax({
+                        type: "post",
+                        url: '{{route('getProductPhotoList')}}',
+                        data:{
+                            '_token':'{{csrf_token()}}',
+                            'pro_id':self.product_id(),
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+
+                            self.clearPriceFields();
+                            if(data.dataCount > 0){
+
+                                $.each(data.data, function (i,item) {
+                                    self.product_photo_list.push(new gridPhotoListRows(item));
+                                });
+                            }
+                        },
+                        error: function(data){
+                            hideLoading();
+
+                            var errors = data.responseJSON.message;
+                            if(typeof data.responseJSON.message == "undefined") errors = (data.responseJSON[0].message);
+
+                            var errorList = "<ul>";
+
+                            if(typeof data.responseJSON.message == "undefined"){
+                                errorList += '<li class="text-center text-danger">' + data.responseJSON[0].message + '</li>';
+                            }else {
+                                $.each(errors, function (i, error) {
+                                    errorList += '<li class="text-center text-danger">' + error + '</li>';
+                                })
+                            }
+                            errorList +="</ul>"
+
+                            sweetAlertMsg(
+                                'Need attention!',
+                                errorList,
+                                'warning'
+                            );
+                        }
+                    });
+                }
+
+                var gridPhotoListRows = function (obj) {
+                    var item = this;
+
+                    if(typeof obj ==="undefined"){
+
+                        item.photo = (typeof self.photoFile() === "undefined" || self.photoFile() == null) ? ko.observable("") : ko.observable(self.photoFile());
+                        item.photoDummy = (typeof self.photoFileDummy() === "undefined" || self.photoFileDummy() == null) ? ko.observable("") : ko.observable(self.photoFileDummy());
+                        item.fileObject = (typeof self.photoFileFileObject() === "undefined" || self.photoFileFileObject() == null) ? ko.observable("") : ko.observable(self.photoFileFileObject());
+                        item.fileFormData = (typeof self.photoFileFormData() === "undefined" || self.photoFileFormData() == null) ? ko.observable("") : ko.observable(self.photoFileFormData());
+                        item.fileDbId = ko.observable("");
+                    }else {
+
+                        item.photo = (typeof obj.image_name === "undefined" || obj.image_name == null) ? ko.observable("") : ko.observable(obj.image_name);
+                        item.photoDummy = (typeof self.photoFileDummy() === "undefined" || self.photoFileDummy() == null) ? ko.observable("") : ko.observable(self.photoFileDummy());
+                        item.fileObject = (typeof self.photoFileFileObject() === "undefined" || self.photoFileFileObject() == null) ? ko.observable("") : ko.observable(self.photoFileFileObject());
+                        item.fileFormData = (typeof self.photoFileFormData() === "undefined" || self.photoFileFormData() == null) ? ko.observable("") : ko.observable(self.photoFileFormData());
+                        item.fileDbId = (typeof obj.id === "undefined" || obj.id == null) ? ko.observable("") : ko.observable(obj.id);
+                    }
+
+                };
+
+                self.RemovePhotoGridRow = function (indexNo,rowData) {
+
+                    self.product_photo_list.remove(rowData);
                 }
 
                 self.submitProduct = function () {

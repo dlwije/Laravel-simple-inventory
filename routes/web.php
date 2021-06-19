@@ -42,4 +42,6 @@ Route::post('submit-edit-product-data',[ProductController::class,'submitEditProd
 
 Route::post('get-product-price-list',[ProductController::class,'getProductPriceList'])->name('getProductPriceList');
 
+Route::post('get-product-photo-list',[ProductController::class,'getProductPhotoList'])->name('getProductPhotoList');
+
 Route::post('inactive-product',[ProductController::class,'inactivateProduct'])->name('inactivateProduct');
