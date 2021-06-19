@@ -33,3 +33,13 @@ Route::post('inactive-category',[CategoryController::class,'inactivateCategory']
 Route::get('product-list', [ProductController::class,'index'])->name('productList');
 
 Route::get('product-add', [ProductController::class,'productAddView'])->name('productAddView');
+
+Route::get('product-edit/{pro_id}', [ProductController::class,'productEditView'])->name('productEditView');
+
+Route::post('submit-product-data',[ProductController::class,'submitProductData'])->name('submitProductData');
+
+Route::post('submit-edit-product-data',[ProductController::class,'submitEditProductData'])->name('submitEditProductData');
+
+Route::post('get-product-price-list',[ProductController::class,'getProductPriceList'])->name('getProductPriceList');
+
+Route::post('inactive-product',[ProductController::class,'inactivateProduct'])->name('inactivateProduct');

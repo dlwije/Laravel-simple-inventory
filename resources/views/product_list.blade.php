@@ -38,7 +38,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a class="btn btn-primary btn-sm" onclick="getEditFormData('{{$cate_list->id}}')"><i class="fa fa-edit"></i></a>
+                                        <a href="{{route('productEditView',['pro_id' => $cate_list->id])}}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
                                         <a class="btn btn-primary btn-sm" onclick="removeCategory('{{$cate_list->id}}')"><i class="fa fa-trash"></i></a>
                                     </td>
                                 </tr>
@@ -145,55 +145,13 @@
             });
         }
 
-        function getEditFormData(id) {
-            cate_id = id;
-            $.ajax({
-                type: "get",
-                url: '/get-edit-category-data/'+id,
-                dataType: 'json',
-                success: function (data) {
-
-                    if(data.dataCount > 0){
-
-                        clearFormFields();
-                        is_new = false;
-                        $('#parent_cate_drop_id').val(data.data[0].parent_id);
-                        $('#category_name').val(data.data[0].c_name);
-                        $('#add-category-model').modal('show');
-
-                    }else{
-                        alert('Error = '+data.message);
-                    }
-
-                },
-                error: function(data){
-
-                    var errors = data.responseJSON.message;
-                    if(typeof data.responseJSON.message == "undefined") errors = (data.responseJSON[0].message);
-
-                    var errorList = "";
-
-                    if(typeof data.responseJSON.message == "undefined"){
-                        errorList +=  data.responseJSON[0].message + '';
-                    }else {
-                        $.each(errors, function (i, error) {
-                            errorList += '' + error + '';
-                        })
-                    }
-                    errorList +=""
-
-                    alert('Need attention! '+errorList);
-                }
-            });
-        }
-
         function removeCategory(id) {
 
             var prom_val = confirm('Are you sure! you want to inactive this?')
             if(prom_val) {
-                $.post("{{route('inactivateCategory')}}", {
+                $.post("{{route('inactivateProduct')}}", {
                     '_token': '{{csrf_token()}}',
-                    'category_id': id
+                    'pro_id': id
                 }, function (res) {
 
                     var json_val = res;

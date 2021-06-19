@@ -8,12 +8,15 @@ interface ProductRepositoryInterface
 {
     public function getAllProductList();
 
-    public function createProduct();
+    public function createProduct($data);
 
-    public function saveProductImages();
+    public function updateProduct($data);
 
-    public function saveProductCategories();
+    public function getSingleProductData($id);
 
-    public function saveProductPrices();
+    public function inactivateProduct($id);
 
+    public function getProductCategoryData($pro_id);
+
+    public function getProductPriceData($pro_id);
 }

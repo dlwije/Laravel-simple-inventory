@@ -23,6 +23,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{{asset('plugins/jquery/jquery.min.js')}}"></script>
     <!-- Bootstrap 4 -->
     <script src="{{asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+
+    <!--Knocout JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js" crossorigin="anonymous"></script>
+
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -175,6 +179,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- REQUIRED SCRIPTS -->
 
 <!-- AdminLTE App -->
+<script>
+    function getSelect2Val(ElementID) {
+
+        if($("#"+ElementID).data("select2")!==undefined) {
+            if ($('#' + ElementID).select2('val') != null) {
+
+                return $('#' + ElementID).select2('data')[0].id;
+            }
+        }
+    }
+    function appSelectEmpty(element) {
+
+        if($("#"+element).data("select2")!==undefined) {
+            var elementSelect = $('#' + element);
+            elementSelect.val(null).trigger('change');
+        }
+    }
+</script>
 <script src="{{asset('js/adminlte.min.js')}}"></script>
 </body>
 </html>

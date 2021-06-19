@@ -10,7 +10,7 @@
     <div class="container-fluid" >
         <div class="card" id="product_add_view">
             <div class="card-header">
-                <h5 class="card-title">Product add</h5>
+                <h5 class="card-title">Product edit</h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -24,13 +24,17 @@
                             <select class="form-control" id="category_drop_id" multiple >
                                 <option value="">-----------------</option>
                                 @foreach($cate_list AS $cat_l)
-                                    <optgroup label="{{$cat_l->c_name}}"></optgroup>
+                                        <optgroup label="{{$cat_l->c_name}}"></optgroup>
+                                    @foreach($cate_edit_list AS $cat_e_l)
 
-                                    @if($cat_l->children)
-                                        @foreach($cat_l->children AS $child)
-                                            <option value="{{$child->id}}">{{$child->c_name}}</option>
-                                        @endforeach
-                                    @endif
+                                        @if($cat_l->children)
+                                            @foreach($cat_l->children AS $child)
+{{--                                                @foreach($cate_edit_list AS $cat_e_l)--}}
+                                                    <option value="{{$child->id}}" @if($child->id == $cat_e_l->category_id) selected @endif>{{$child->c_name}}</option>
+{{--                                                @endforeach--}}
+                                            @endforeach
+                                        @endif
+                                    @endforeach
                                 @endforeach
                             </select>
                         </div>
@@ -86,37 +90,6 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>File</label>
-                            <input type="file" class="form-control" name="pro_photo" id="pro_photo" data-bind="fileInput: fileData2">
-                        </div>
-                    </div>
-                    <div class="col-md-1" style="margin-top: 35px;">
-                        <button class="btn btn-primary btn-sm" onclick="productAdd.ivm.addToPhotosGrid()" data-toggle="tooltip" data-placement="top" title="Add new document"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <table class="table table-responsive table-striped table-condensed">
-                            <thead>
-                            <tr>
-                                <th>File</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody data-bind="foreach: product_photo_list">
-                            <tr>
-                                <td data-bind="text: photoDummy"></td>
-
-                                <td class="text-center" ><i class="fas fa-trash" style="cursor: pointer;color: red;" data-bind="click: $parent.RemovePhotoGridRow.bind($data, $index())"></i></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-12">
                         <button class="btn btn-primary btn-sm" onclick="productAdd.ivm.submitProduct();">Submit</button>
                     </div>
@@ -127,8 +100,6 @@
     </div><!-- /.container-fluid -->
 
     <script src="{{asset('/plugins/select2/js/select2.full.min.js')}}"></script>
-    <link rel="stylesheet" href="https://rawgit.com/adrotec/knockout-file-bindings/master/knockout-file-bindings.css" crossorigin="anonymous" />
-    <script src="https://rawgit.com/adrotec/knockout-file-bindings/master/knockout-file-bindings.js" crossorigin="anonymous"></script>
     <script>
         $(document).ready(function () {
             // $('.select2').select2()
@@ -146,7 +117,7 @@
             init: function () {
                 productAdd.ivm = new productAdd.productAddViewModel();
                 ko.applyBindings(productAdd.ivm, $('#product_add_view')[0]);
-                productAdd.ivm.designInit();
+                productAdd.ivm.getProductPriceList();
             },
             productAddViewModel: function () {
 
@@ -162,78 +133,54 @@
                 self.pro_price = ko.observable("");
                 self.product_price_list = ko.observableArray("");
 
-                self.photoFile = ko.observable("");
-                self.photoFileFileObject = ko.observable("");
-                self.photoFileDummy = ko.observable("");
-                self.photoFileFormData = ko.observable("");
-                self.product_photo_list = ko.observableArray("");
+                self.pro_name('{{$pro_data[0]->p_name}}');
+                self.product_id('{{$pro_data[0]->id}}');
 
-                self.fileData2 = ko.observable({
-                    dataURL: ko.observable(),
-                    text: ko.observable(),
-                    file: ko.observable(),
-                    // base64String: ko.observable(),
-                });
+                self.getProductPriceList = function () {
 
-                self.designInit = function () {
+                    $.ajax({
+                        type: "post",
+                        url: '{{route('getProductPriceList')}}',
+                        data:{
+                            '_token':'{{csrf_token()}}',
+                            'pro_id':self.product_id(),
+                        },
+                        dataType: 'json',
+                        success: function (data) {
 
-                    self.fileData2().dataURL.subscribe(function(dataURL){
-                        self.photoFile(dataURL);
+                            self.clearPriceFields();
+                            if(data.dataCount > 0){
+
+                                $.each(data.data, function (i,item) {
+                                    self.product_price_list.push(new gridColPriceListRows(item));
+                                });
+                            }
+                        },
+                        error: function(data){
+                            hideLoading();
+
+                            var errors = data.responseJSON.message;
+                            if(typeof data.responseJSON.message == "undefined") errors = (data.responseJSON[0].message);
+
+                            var errorList = "<ul>";
+
+                            if(typeof data.responseJSON.message == "undefined"){
+                                errorList += '<li class="text-center text-danger">' + data.responseJSON[0].message + '</li>';
+                            }else {
+                                $.each(errors, function (i, error) {
+                                    errorList += '<li class="text-center text-danger">' + error + '</li>';
+                                })
+                            }
+                            errorList +="</ul>"
+
+                            sweetAlertMsg(
+                                'Need attention!',
+                                errorList,
+                                'warning'
+                            );
+                        }
                     });
-                    self.fileData2().file.subscribe(function(file){
-                        self.photoFileFileObject(file);
-                        self.photoFileDummy(file.name);
-                        // console.log(file.get(0).files)
-                    });
-                }
 
-                self.addToPhotosGrid = function () {
-
-                    if(!self.photoFieldsValidation()){ return; }
-
-                    var data = new FormData();
-                    var files = $("#pro_photo").get(0).files;
-                    data.append("file", files[0]);
-
-                    self.photoFileFormData(data);
-
-                    self.product_photo_list.push(new gridPhotoListRows());
-                    self.clearPhotoFields();
-                }
-
-                self.photoFieldsValidation = function () {
-
-                    if((self.photoFile() === "") || (typeof self.photoFile() === "undefined")){
-
-                        alert('Required / Please fill the photo fields first!');
-                        return false;
-                    }
-                    return true;
-                }
-
-                var gridPhotoListRows = function (obj) {
-                    var item = this;
-
-                    if(typeof obj ==="undefined"){
-
-                        item.photo = (typeof self.photoFile() === "undefined" || self.photoFile() == null) ? ko.observable("") : ko.observable(self.photoFile());
-                        item.photoDummy = (typeof self.photoFileDummy() === "undefined" || self.photoFileDummy() == null) ? ko.observable("") : ko.observable(self.photoFileDummy());
-                        item.fileObject = (typeof self.photoFileFileObject() === "undefined" || self.photoFileFileObject() == null) ? ko.observable("") : ko.observable(self.photoFileFileObject());
-                        item.fileFormData = (typeof self.photoFileFormData() === "undefined" || self.photoFileFormData() == null) ? ko.observable("") : ko.observable(self.photoFileFormData());
-                        item.fileDbId = ko.observable("");
-                    }
-
-                };
-                self.RemovePhotoGridRow = function (indexNo,rowData) {
-
-                    self.product_photo_list.remove(rowData);
-                }
-                self.clearPhotoFields = function () {
-
-                    self.photoFile("");
-                    self.photoFileFileObject("");
-                    self.photoFileDummy("");
-                    self.photoFileFormData("");
                 }
 
                 self.submitProduct = function () {
@@ -241,14 +188,13 @@
 
                     $.ajax({
                         type: "post",
-                        url: '{{route('submitProductData')}}',
+                        url: '{{route('submitEditProductData')}}',
                         data:{
                             '_token':'{{csrf_token()}}',
                             'pro_id':self.product_id(),
                             'pro_name':self.pro_name(),
                             'category_ids':self.category_ids(),
                             'pro_price_list':ko.toJSON(self.product_price_list),
-                            'pro_photo_list':ko.toJSON(self.product_photo_list),
                         },
                         dataType: 'json',
                         success: function (data) {
@@ -258,6 +204,7 @@
 
                                 alert('Success / '+data.message);
                                 self.clearAllFields();
+                                location.reload();
                             }else{
                                 alert('Error / '+data.message);
                             }
@@ -303,6 +250,10 @@
                         item.cf_id = ko.observable("");
                     }else{
 
+                        item.lot_no_grid = (typeof obj.lot_no === "undefined" || obj.lot_no == null) ? ko.observable("") : ko.observable(obj.lot_no);
+                        item.pro_qty_grid = (typeof obj.product_qty === "undefined" || obj.product_qty == null) ? ko.observable("") : ko.observable(obj.product_qty);
+                        item.pro_price_grid = (typeof obj.product_price === "undefined" || obj.product_price == null) ? ko.observable("") : ko.observable(obj.product_price);
+                        item.cf_id = (typeof obj.id === "undefined" || obj.id == null) ? ko.observable("") : ko.observable(obj.id);
                     }
                 };
 
@@ -320,13 +271,11 @@
 
                 self.clearAllFields = function () {
                     self.clearPriceFields();
-                    self.clearPhotoFields();
 
                     appSelectEmpty('category_drop_id');
                     self.category_ids("");
                     self.pro_name("");
                     self.product_price_list.removeAll();
-                    self.product_photo_list.removeAll();
 
                 }
             }
